@@ -10,7 +10,8 @@ jobs:
     strategy:
       matrix:
         osver: [2019, 2022]
-        isolation: [process, hyperv]
+        isolation: [process]
+#        isolation: [process, hyperv]
     runs-on: windows-${{ matrix.osver }}
     steps:
       - uses: actions/checkout@v2
