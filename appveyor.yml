@@ -63,3 +63,6 @@ test_script:
     if %CONFIGURATION% == patched copy dist\msys2-runtime-*.* opt
     copy test_rm_and_mv.cmd opt
     docker run --isolation=%isolation% -v "c:\msys64:c:\msys64" -v "%APPVEYOR_BUILD_FOLDER%\binded_dir:c:\binded_dir" -v "%APPVEYOR_BUILD_FOLDER%\opt:c:\opt" mcr.microsoft.com/windows/servercore:%container_tag% cmd.exe /s /c "c:\opt\test_rm_and_mv.cmd"
+artifacts:
+- path: opt\*.trace
+- path: dist\msys2-runtime-*
