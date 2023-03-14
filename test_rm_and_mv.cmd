@@ -4,7 +4,7 @@ set PROMPT=+$s
 set result=0
 
 dir c:\opt\msys2-runtime-* > NUL 2>&1
-if NOT ERRORLEVEL 1 sh -x -c "pacman -Up --noconfirm /c/opt/msys2-runtime-*"
+if NOT ERRORLEVEL 1 sh -x -c "pacman -U --noconfirm /c/opt/msys2-runtime-*"
 
 echo;
 echo === normal directory : prepare

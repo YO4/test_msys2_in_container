@@ -41,6 +41,8 @@ build_script:
   - cmd: |
       set PATH=c:\msys64\usr\bin;%PATH%
       set MSYSTEM=MSYS
+      pacman -Syu --noconfirm
+      pacman -Syu --noconfirm
   - cmd: "
       bash -x -c \"
         rm -rf msys2-runtime ;
