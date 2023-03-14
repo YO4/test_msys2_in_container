@@ -1,0 +1,65 @@
+version: 1.0.{build}
+image:
+- Visual Studio 2019
+- Visual Studio 2017
+configuration:
+- release
+- patched
+cache:
+  -  c:\msys64\var\cache\pacman\pkg
+  -  dist
+environment:
+  matrix:
+  - container_tag: ltsc2016
+    isolation: process
+  - container_tag: ltsc2016
+    isolation: hyperv
+  - container_tag: ltsc2019
+    isolation: process
+  - container_tag: ltsc2019
+    isolation: hyperv
+matrix:
+  allow_failures:
+    - container_tag: ltsc2016
+      isolation: process
+    - container_tag: ltsc2016
+      isolation: hyperv
+    - container_tag: ltsc2019
+      isolation: process
+    - container_tag: ltsc2019
+      isolation: hyperv
+  exclude:
+    - image: Visual Studio 2017
+      container_tag: ltsc2019
+    - image: Visual Studio 2019
+      container_tag: ltsc2016
+      isolation: process
+    - image: Visual Studio 2017
+      container_tag: ltsc2016
+      isolation: hyperv
+build_script:
+  - cmd: |
+      set PATH=c:\msys64\usr\bin;%PATH%
+      set MSYSTEM=MSYS
+  - cmd: "
+      bash -x -c \"
+        rm -rf msys2-runtime ;
+        rm -rf src ;
+        mkdir -p src ;
+        git clone --depth 1 --filter=tree:0 --no-checkout -b in-container-posix-semantics https://github.com/YO4/msys2-runtime src/msys2-runtime ;
+        makepkg -d -e -o ;
+        VER=(`makepkg --packagelist`) ;
+        test -e dist/`basename ${VER[0]}` -a -e dist/`basename ${VER[1]}` || (
+          makepkg -s --noconfirm ;
+          rm -f dist/* ;
+          mkdir -p dist;
+          mv `makepkg --packagelist` dist/ 
+        )\"
+      "
+test_script:
+- cmd: |
+    mkdir binded_dir
+    mkdir opt
+    if %CONFIGURATION% == patched copy dist\msys2-runtime-*.* opt
+    copy test_rm_and_mv.cmd opt
+    docker run --isolation=%isolation% -v "c:\msys64:c:\msys64" -v "%APPVEYOR_BUILD_FOLDER%\binded_dir:c:\binded_dir" -v "%APPVEYOR_BUILD_FOLDER%\opt:c:\opt" mcr.microsoft.com/windows/servercore:%container_tag% cmd.exe /s /c "c:\opt\test_rm_and_mv.cmd"
