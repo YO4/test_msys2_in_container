@@ -34,7 +34,7 @@ prepare() {
   if test true != "$(git config core.symlinks)"
   then
     git config core.symlinks true &&
-    /usr/bin/git reset --hard
+    git reset --hard
   fi
 }
 
