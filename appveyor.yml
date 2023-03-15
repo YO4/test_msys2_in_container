@@ -48,6 +48,7 @@ build_script:
       pacman -Syu --noconfirm
   - cmd: "
       bash -x -c \"
+        if [ ${CONFIGURATION}=release ] ; then exit 0; fi ;
         rm -rf msys2-runtime ;
         rm -rf src ;
         mkdir -p src ;
