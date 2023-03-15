@@ -1,7 +1,7 @@
 version: 1.0.{build}
 image:
-- Visual Studio 2017
 - Visual Studio 2019
+- Visual Studio 2017
 configuration:
 - release
 - patched
@@ -42,6 +42,9 @@ matrix:
       container_tag: ltsc2016
       isolation: hyperv
 install:
+  - cmd:
+      set PATH=c:\msys64\usr\bin;%PATH%
+      set MSYSTEM=MSYS
   - cmd: '
       if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" (
         rd /s /q c:\msys64\etc\pacman.d\gnupg &
@@ -49,13 +52,11 @@ install:
         curl -L -o msys2\msys2-base-x86_64-20230127.tar.xz https://repo.msys2.org/distrib/x86_64/msys2-base-x86_64-20230127.tar.xz &&
         rmdir /s /q c:\msys64 &&
         7z.exe x -so msys2\msys2-base-x86_64-20230127.tar.xz | 7z.exe x -ttar -si -o\ -aoa &&
-        c:\msys64\msys2_shell.cmd -defterm -no-start -here -msys <NUL
+        c:\msys64\msys2_shell.cmd -defterm -no-start -here -msys <NUL &&
+        bash -x -c "pacman -Syu --noconfirm" &&
+        bash -x -c "pacman -Syu --noconfirm"
       )'
 build_script:
-  - cmd:
-      set PATH=c:\msys64\usr\bin;%PATH%
-      set MSYSTEM=MSYS
-test_script:
   - cmd: '
       if %configuration% == patched ( bash -x -c "
         rm -rf msys2-runtime ;
@@ -71,6 +72,7 @@ test_script:
           mkdir -p dist;
           mv `makepkg --packagelist` dist/ 
         )") else (echo > NUL)'
+test_script:
   - cmd: |
       mkdir binded_dir
       mkdir opt
