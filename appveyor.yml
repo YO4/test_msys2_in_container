@@ -41,13 +41,18 @@ matrix:
       container_tag: ltsc2016
       isolation: hyperv
 build_script:
-  - cmd: |
+  - cmd:
       set PATH=c:\msys64\usr\bin;%PATH%
       set MSYSTEM=MSYS
-      pacman -Syu --noconfirm
-      pacman -Syu --noconfirm
+  - cmd: '
+      if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" (
+        bash -c "pacman-key --populate msys2" && bash -c "pacman-key --refresh-keys" &&
+        pacman -Syu --noconfirm &&
+        pacman -Syu --noconfirm
+      )'
   - cmd: "
       bash -x -c \"
+        if [ ${CONFIGURATION}=release ] ; then exit 0; fi ;
         rm -rf msys2-runtime ;
         rm -rf src ;
         mkdir -p src ;
@@ -65,7 +70,7 @@ test_script:
 - cmd: |
     mkdir binded_dir
     mkdir opt
-    if %CONFIGURATION% == patched copy dist\msys2-runtime-*.* opt
+    if %CONFIGURATION% == patched sh -x -c "pacman -U --noconfirm ./dist/msys2-runtime-*"
     copy test_rm_and_mv.cmd opt
     set SAVE_ARTIFACT=true
     docker run --isolation=%isolation% -v "c:\msys64:c:\msys64" -v "%APPVEYOR_BUILD_FOLDER%\binded_dir:c:\binded_dir" -v "%APPVEYOR_BUILD_FOLDER%\opt:c:\opt" mcr.microsoft.com/windows/servercore:%container_tag% cmd.exe /s /c "c:\opt\test_rm_and_mv.cmd"
