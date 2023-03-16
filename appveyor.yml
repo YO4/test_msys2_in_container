@@ -42,7 +42,7 @@ matrix:
       container_tag: ltsc2016
       isolation: hyperv
 install:
-  - cmd:
+  - cmd: |
       set PATH=c:\msys64\usr\bin;%PATH%
       set MSYSTEM=MSYS
   - cmd: '
@@ -63,7 +63,7 @@ build_script:
         rm -rf src ;
         mkdir -p src ;
         git clone --depth 1 --filter=tree:0 --no-checkout -b in-container-posix-semantics https://github.com/YO4/msys2-runtime src/msys2-runtime ;
-        pacman -S --noconfirm base-devel ;
+        pacman -S --noconfirm base-devel git;
         makepkg -d -e -o;
         VER=(`makepkg --packagelist`) ;
         test -e dist/`basename ${VER[0]}` -a -e dist/`basename ${VER[1]}` || (
@@ -79,7 +79,7 @@ test_script:
       if %configuration% == patched sh -x -c "pacman -U --noconfirm ./dist/msys2-runtime-*"
       copy test_rm_and_mv.cmd opt
       set SAVE_ARTIFACT=true
-      docker run --isolation=%isolation% -v "c:\msys64:c:\msys64" -v "%APPVEYOR_BUILD_FOLDER%\binded_dir:c:\binded_dir" -v "%APPVEYOR_BUILD_FOLDER%\opt:c:\opt" mcr.microsoft.com/windows/servercore:%container_tag% cmd.exe /s /c "c:\opt\test_rm_and_mv.cmd"
+      cmd /V:ON /s /c "docker run --isolation=%isolation% -v c:\msys64:c:\msys64 -v %APPVEYOR_BUILD_FOLDER%\binded_dir:c:\binded_dir -v %APPVEYOR_BUILD_FOLDER%\opt:c:\opt mcr.microsoft.com/windows/servercore:%container_tag% cmd.exe /c c:\opt\test_rm_and_mv.cmd & set result=!ERRORLEVEL! & echo; & echo === host environment & ver & echo; & echo === test complete & exit /b !result!"
 artifacts:
 - path: opt\*.trace
 - path: dist\msys2-runtime-*

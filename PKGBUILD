@@ -6,7 +6,7 @@ pkgdesc="Cygwin POSIX emulation engine"
 arch=('x86_64')
 license=('GPL')
 makedepends=('cocom'
-#            'git'
+             'git'
              'perl'
              'gcc'
              'mingw-w64-cross-crt-git'

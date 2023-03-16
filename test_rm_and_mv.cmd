@@ -60,10 +60,11 @@ call :a
 sh -x -c "(find /c/normal_dir /c/binded_dir -type f)"
 
 echo;
-echo === environment
+echo === container environment
 
 sh -x -c "pacman -Q msys2-runtime coreutils"
 sh -x -c "ls -l /usr/bin/msys-2.0.dll"
+ver
 
 exit /b %result%
 
