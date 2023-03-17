@@ -7,8 +7,16 @@ configuration:
 - patched
 cache:
   -  c:\msys64\var\cache\pacman\pkg
-  -  dist
   -  msys2
+for:
+- 
+  matrix:
+    only:
+      -  configuration: patched
+  cache:
+    -  c:\msys64\var\cache\pacman\pkg
+    -  dist
+    -  msys2
 environment:
   global:
     APPVEYOR_SAVE_CACHE_ON_ERROR: true
